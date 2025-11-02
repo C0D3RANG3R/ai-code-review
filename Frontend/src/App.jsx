@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-// REMOVED: import "prismjs/themes/prism-tomorrow.css"; // Causing resolution error
+import "prismjs/themes/prism-tomorrow.css"; // Causing resolution error
 import Editor from "react-simple-code-editor";
 import prism from "prismjs";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
-// REMOVED: import "highlight.js/styles/github-dark.css"; // Causing resolution error
+import "highlight.js/styles/github-dark.css"; // Causing resolution error
 import axios from "axios";
 import { ClipboardCopy, Check, Loader2, AlertTriangle } from "lucide-react";
 
@@ -124,7 +124,7 @@ function App() {
           return (
               <Markdown
                   rehypePlugins={[rehypeHighlight]}
-                  className="prose prose-invert max-w-none text-white overflow-auto h-full p-1"
+                  className="prose prose-invert max-w-none text-white overflow-auto h-full p-1 leading-8"
               >
                   {review}
               </Markdown>
