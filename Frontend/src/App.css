@@ -1,0 +1,249 @@
+/*
+ * Global Reset: Using system default font for UI, and a monospaced font for code.
+ */
+:root {
+  /* Colors for a professional dark theme */
+  --color-bg-primary: #0f172a;   /* Dark Navy/Slate Background */
+  --color-bg-card: #1e293b;      /* Slightly lighter card background */
+  --color-text-light: #e2e8f0;   /* Light gray for primary text */
+  --color-text-faded: #94a3b8;   /* Faded gray for secondary text/lines */
+  --color-accent-blue: #3b82f6;  /* Primary action color (Blue) */
+  --color-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2); /* Subtle card shadow */
+  --font-ui: "Inter", sans-serif;
+  --font-code: "JetBrains Mono", Consolas, monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/*
+ * GLOBAL TYPOGRAPHY AND INTERACTIVE ELEMENTS (REFINED)
+ */
+
+a {
+  font-weight: 500;
+  color: var(--color-accent-blue);
+  text-decoration: none; /* Removed underline for a cleaner look */
+  transition: color 0.25s;
+}
+a:hover {
+  color: #60a5fa; /* Lighter shade of blue on hover */
+}
+
+h1 {
+  /* Style for a prominent, overall application title */
+  font-size: 3.2em;
+  line-height: 1.1;
+  color: var(--color-text-light);
+  margin-bottom: 1.5rem; /* Ensure space below the main title */
+}
+
+/* Generic Button Styles (for non-primary actions) */
+button {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-text-faded);
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  background-color: var(--color-bg-card); /* Consistent card background */
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+button:hover {
+  border-color: var(--color-accent-blue);
+  background-color: #2e3e52; /* Subtle change on hover */
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto var(--color-accent-blue);
+}
+
+/*
+ * List Styling (ENHANCED: Clean, interactive list items)
+ */
+ul, ol {
+    list-style: none; /* Removes bullet points/numbers */
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    /* Enhanced styling for better visual appearance and clickability */
+    padding: 0.5rem 0.75rem; /* Internal padding for better visual spacing and tap targets */
+    margin-bottom: 0.25rem; /* Vertical spacing between items */
+    border-radius: 0.3rem; /* Small rounding on list items */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+li:hover {
+    background-color: #2e3e52; /* Subtle background change on hover for interactivity */
+}
+
+/*
+ * Scrollbar Customization (Enhances Appeal in Dark Mode)
+ */
+/* Applies to all scrollable containers (body, code blocks, review panel) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary); /* Track matches the app background */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155; /* Dark, subtle thumb color (Slate-700) */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* Slightly lighter on hover */
+}
+
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  /* Apply the dark theme globally */
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-light);
+  font-family: var(--font-ui);
+}
+
+/*
+ * Main Layout: Centered, flexible container
+ */
+main {
+  height: 100%;
+  width: 100%;
+  padding: 2rem; /* Increased padding for breathing room */
+  display: flex;
+  gap: 1.5rem; /* Increased gap */
+}
+
+.app-header {
+    padding: 1rem 2rem;
+    background-color: var(--color-bg-card);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/*
+ * Core Panels (Left/Right)
+ */
+main .left,
+main .right {
+  height: 100%;
+  flex-basis: 50%;
+  border-radius: 0.75rem; /* Slightly more rounded corners */
+  box-shadow: var(--color-shadow-md); /* Add subtle shadow for depth */
+  transition: all 0.3s ease;
+}
+
+/*
+ * Left Panel: Code Viewer - FIX SCROLLING ISSUE
+ */
+main .left {
+  background-color: var(--color-bg-card); /* Lighter slate background for the card */
+  position: relative;
+  overflow: hidden; /* Ensure content stays within borders */
+  /* FIX: Use Flexbox to manage vertical space reliably */
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgb(221, 221, 221);
+}
+
+/*
+ * Code Block - Primary scrollable area
+ */
+.left .code {
+  /* FIX: Ensure the code block takes up all available vertical space */
+  flex-grow: 1;
+  /* FIX: Apply scrolling here, the content will scroll within this div */
+  overflow-y: auto;
+  width: 100%;
+  height: auto; /* Handled by flex-grow */
+  margin: 0;
+  padding: 0;
+  border-radius: 0.75rem;
+  background-color: #111827;
+}
+
+.code pre,
+.code pre code {
+  /* These are style wrappers within the scrollable container */
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  border-radius: 0.75rem;
+  /* Very dark background for the code area itself to maximize contrast and focus */
+  background-color: #111827; /* Near-black for code block */
+  color: var(--color-text-light);
+  font-family: var(--font-code); /* Monospace for code readability */
+  padding: 1.5rem; /* Add internal padding to the code block */
+  /* IMPORTANT: Remove overflow: auto; from here, let parent (.left .code) handle it */
+  overflow: initial;
+}
+
+/*
+ * Review Button: Primary Action
+ */
+main .left .review {
+  position: absolute;
+  bottom: 1.5rem; /* Pushed away from the edge */
+  right: 1.5rem;
+  background-color: var(--color-accent-blue);
+  color: #ffffff; /* White text for maximum contrast on primary button */
+  padding: 0.75rem 2.5rem; /* More prominent size */
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  border-radius: 0.5rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); /* Shadow to make it pop */
+  transition: all 0.2s ease-in-out;
+}
+
+main .left .review:hover {
+  background-color: #2563eb; /* Slightly darker blue on hover */
+  transform: translateY(-2px); /* Lift effect */
+}
+
+main .left .review:active {
+  transform: translateY(0); /* Press effect */
+}
+
+/*
+ * Right Panel: Review Comments/Summary
+ */
+main .right {
+  background-color: var(--color-bg-card);
+  padding: 1.5rem;
+  font-size: 1.1rem; /* Adjusted for better reading flow */
+  line-height: 1.6;
+  color: var(--color-text-light);
+  overflow-y: auto;
+  word-wrap: break-word;
+}
+
+/* Add a title/heading style for the right panel content */
+main .right h2 {
+    color: var(--color-accent-blue);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
