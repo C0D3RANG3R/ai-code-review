@@ -1,5 +1,13 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+const AI_CONFIG = {
+    model: "gemini-2.0-flash",
+    generationConfig: {
+        maxOutputTokens: 4096, 
+        temperature: 0.2
+    }
+};
+
 const SYSTEM_INSTRUCTION = `
                 Here’s a solid system instruction for your AI code reviewer:
 
@@ -37,12 +45,11 @@ const SYSTEM_INSTRUCTION = `
 
                 ❌ Bad Code:
                 \`\`\`javascript
-                                function fetchData() {
+                function fetchData() {
                     let data = fetch('/api/data').then(response => response.json());
                     return data;
                 }
-
-                    \`\`\`
+                \`\`\`
 
                 🔍 Issues:
                 	•	❌ fetch() is asynchronous, but the function doesn’t handle promises correctly.
@@ -50,7 +57,7 @@ const SYSTEM_INSTRUCTION = `
 
                 ✅ Recommended Fix:
 
-                        \`\`\`javascript
+                \`\`\`javascript
                 async function fetchData() {
                     try {
                         const response = await fetch('/api/data');
@@ -61,7 +68,7 @@ const SYSTEM_INSTRUCTION = `
                         return null;
                     }
                 }
-                   \`\`\`
+                \`\`\`
 
                 💡 Improvements:
                 	•	✔ Handles async correctly using async/await.
@@ -75,40 +82,52 @@ const SYSTEM_INSTRUCTION = `
                 Would you like any adjustments based on your specific needs? 🚀 
     `;
 
-const AI_CONFIG = {
-    model: "gemini-2.0-flash",
-    systemInstruction: SYSTEM_INSTRUCTION
-};
 
 class AIService {
     constructor() {
         if (!process.env.GOOGLE_GEMINI_KEY) {
-            throw new Error('GOOGLE_GEMINI_KEY is not configured');
+            throw new Error('Configuration Error: GOOGLE_GEMINI_KEY environment variable is not set.');
         }
+        
         this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_KEY);
-        this.model = this.genAI.getGenerativeModel(AI_CONFIG);
+
+        this.model = this.genAI.getGenerativeModel({
+            model: AI_CONFIG.model,
+            config: {
+                systemInstruction: SYSTEM_INSTRUCTION,
+                ...AI_CONFIG.generationConfig,
+            }
+        });
     }
 
-    async generateContent(prompt) {
+    async generateContent(code) {
+        if (!code) {
+            const err = new Error('Input validation failed: Code prompt is required.');
+            err.statusCode = 400; 
+            throw err;
+        }
+
         try {
-            if (!prompt) {
-                throw new Error('Prompt is required');
+            const result = await this.model.generateContent(code);
+            const responseText = result.response.text; 
+
+            if (!responseText) {
+                const err = new Error('AI Service Error: No review content generated from the model.');
+                err.statusCode = 502;
+                throw err;
             }
 
-            const result = await this.model.generateContent(prompt);
-            const response = result.response.text();
+            return responseText;
 
-            if (!response) {
-                throw new Error('No response generated');
-            }
-
-            return response;
         } catch (error) {
-            console.error('Content generation failed:', error);
-            throw new Error(`Failed to generate content: ${error.message}`);
+            console.error(`[AI_SERVICE_ERROR] Content generation failed. Status: ${error.status || 'N/A'}, Message: ${error.message}`);
+            
+            const err = new Error(`AI Service failed to process the request: ${error.message}`);
+            err.statusCode = error.status === 400 ? 400 : 500; 
+            throw err;
         }
     }
 }
 
-const aiService = new AIService();
-module.exports = aiService.generateContent.bind(aiService);
+const aiServiceInstance = new AIService();
+module.exports = aiServiceInstance.generateContent.bind(aiServiceInstance);
