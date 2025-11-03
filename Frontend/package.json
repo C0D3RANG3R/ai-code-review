@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "axios": "^1.7.9",
+    "full-stack-ai-reviewer": "file:..",
     "lucide-react": "^0.475.0",
     "prismjs": "^1.29.0",
     "react": "^19.0.0",
