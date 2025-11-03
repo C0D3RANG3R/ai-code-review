@@ -35,7 +35,7 @@ const model = genAI.getGenerativeModel({
 
         # Output Structure (MANDATORY TEMPLATE)
 
-        ## 🔍 Issues Found
+        ## ❌ Issues Found
         
         Provide a list of issues using Markdown bullet points. Be specific and concise.
         
