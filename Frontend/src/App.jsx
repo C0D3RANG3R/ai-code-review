@@ -1,15 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import "prismjs/themes/prism-tomorrow.css"; // Causing resolution error
+import "prismjs/themes/prism-tomorrow.css";
 import Editor from "react-simple-code-editor";
 import prism from "prismjs";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css"; // Causing resolution error
+import "highlight.js/styles/github-dark.css";
 import axios from "axios";
 import { ClipboardCopy, Check, Loader2, AlertTriangle } from "lucide-react";
 
-// Note: Assuming the backend (on render) now has the corrected CORS policy applied.
-const API_URL = "http://localhost:8000/ai/get-review";
+const API_URL = "/ai/get-review";
 const INITIAL_CODE = `function calculateTotal(items) {
   let total = 0;
   for (let i = 0; i < items.length; i++) {
@@ -28,14 +27,12 @@ function App() {
   const editorRef = useRef(null);
 
   useEffect(() => {
-    // Focus logic remains for convenience
     if (editorRef.current) {
       editorRef.current.querySelector("textarea")?.focus();
     }
   }, [code]);
 
   async function reviewCode() {
-    // Reset previous states
     setReview("");
     setError(null);
     setIsLoading(true);
@@ -46,21 +43,15 @@ function App() {
         { code }
       );
       
-      // ✅ FIX: Correctly access the response data using the 'data' key from the controller
       setReview(response.data.review);
 
     } catch (error) {
-      console.error("Error fetching review:", error);
-      
       let errorMessage = "An unknown error occurred.";
       if (error.response) {
-          // Server responded with a status code outside the 2xx range (e.g., 400, 500)
-          errorMessage = error.response.data.message || `Server error: ${error.response.status}`;
+          errorMessage = error.response.data.error || `Server error: ${error.response.status}`;
       } else if (error.request) {
-          // The request was made but no response was received (e.g., network error, CORS not fully resolved)
-          errorMessage = "Network Error: Could not reach the API server.";
+          errorMessage = "Network Error: Could not reach the API server. Check backend is running on port 8000.";
       } else {
-          // Something else happened while setting up the request
           errorMessage = error.message;
       }
 
@@ -71,11 +62,9 @@ function App() {
   }
 
   const copyToClipboard = () => {
-    // Use the older execCommand fallback just in case, though navigator.clipboard is standard
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(code);
     } else {
-        // Fallback for environments where clipboard API is restricted (e.g., older browsers/iframes)
         const textarea = document.createElement('textarea');
         textarea.value = code;
         document.body.appendChild(textarea);
@@ -83,7 +72,7 @@ function App() {
         try {
             document.execCommand('copy');
         } catch (err) {
-            console.error('Failed to copy text (execCommand fallback):', err);
+            console.error('Failed to copy text:', err);
         }
         document.body.removeChild(textarea);
     }
@@ -93,38 +82,34 @@ function App() {
   };
 
   const handlePaste = (event) => {
-    // Allows pasting directly into the editor without complex manual handling,
-    // as react-simple-code-editor handles the input value correctly.
   };
 
   const ReviewDisplay = () => {
       if (isLoading) {
           return (
               <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                  <Loader2 className="animate-spin h-10 w-10 text-green-500" />
-                  <p className="mt-4 text-lg">Reviewing code with Gemini...</p>
+                  <Loader2 className="animate-spin h-10 w-10 text-emerald-400" />
+                  <p className="mt-4 text-lg font-semibold">Generating Review...</p>
               </div>
           );
       }
       
       if (error) {
           return (
-              <div className="flex flex-col items-center justify-center h-full p-4 bg-red-900/20 border border-red-700 rounded-lg">
-                  <AlertTriangle className="h-10 w-10 text-red-500" />
-                  <h3 className="mt-3 text-xl font-bold text-red-400">Review Failed</h3>
-                  <p className="mt-2 text-center text-red-300 break-words">{error}</p>
-                  <p className="mt-4 text-sm text-red-400">
-                    If the error persists, please verify the backend API key and CORS configuration.
-                  </p>
+              <div className="flex flex-col items-center justify-center h-full p-6 bg-red-900/30 border border-red-600 rounded-xl">
+                  <AlertTriangle className="h-12 w-12 text-red-500" />
+                  <h3 className="mt-4 text-xl font-extrabold text-red-400">Review Failed</h3>
+                  <p className="mt-2 text-center text-red-300 break-words text-sm">{error}</p>
               </div>
           );
       }
 
       if (review) {
           return (
+              // Enhanced prose styles for better readability of the markdown output
               <Markdown
                   rehypePlugins={[rehypeHighlight]}
-                  className="prose prose-invert max-w-none text-white overflow-auto h-full p-1 leading-8"
+                  className="prose prose-invert prose-code:bg-gray-700/50 prose-code:text-yellow-300 prose-pre:bg-gray-700/70 prose-li:marker:text-emerald-400 prose-strong:text-emerald-300 max-w-none text-gray-200 overflow-auto h-full p-1 leading-loose"
               >
                   {review}
               </Markdown>
@@ -132,22 +117,23 @@ function App() {
       }
 
       return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-              <p className="text-xl">Click "Review Code" to get started.</p>
+          <div className="flex items-center justify-center h-full text-gray-500">
+              <p className="text-xl font-light">Paste your code and click "Review" to begin.</p>
           </div>
       );
   };
 
 
   return (
-    <main className="h-screen w-full p-4 flex flex-col lg:flex-row gap-4 bg-gray-900 text-white font-sans">
+    <main className="h-screen w-full p-6 flex flex-col lg:flex-row gap-6 bg-gray-950 text-white font-sans">
       
       {/* Left Section (Code Input) */}
-      <div className="flex-1 min-h-[40vh] lg:min-h-full bg-gray-800 p-4 rounded-xl shadow-2xl flex flex-col">
-        <h2 className="text-2xl font-bold mb-3 text-green-400">Code Editor</h2>
+      <div className="flex-1 min-h-[40vh] lg:min-h-full bg-gray-900 p-5 rounded-3xl shadow-2xl shadow-gray-900/50 flex flex-col border border-gray-800">
+        <h2 className="text-3xl font-extrabold mb-4 text-emerald-400 border-b border-gray-700/50 pb-2">Code Editor</h2>
         <div
           ref={editorRef}
-          className="relative flex-1 overflow-auto border border-gray-700 rounded-lg w-full code-editor-container"
+          // Removed border-gray-700 from editor container for cleaner look
+          className="relative flex-1 overflow-auto rounded-xl w-full code-editor-container"
         >
           <Editor
             value={code}
@@ -155,23 +141,24 @@ function App() {
             highlight={(code) =>
               prism.highlight(code, prism.languages.javascript, "javascript")
             }
-            padding={15}
-            // Use the CSS class for styling the textarea/pre elements
+            padding={20} // Increased padding
             className="editor-textarea" 
             onPaste={handlePaste}
             style={{
               fontFamily: '"Fira Code", monospace',
-              fontSize: 16,
+              fontSize: 15,
               minHeight: "100%",
-              backgroundColor: '#1E293B', // Match surrounding dark background
-              lineHeight: 1.5,
+              backgroundColor: '#1F2937', // Slightly different background for depth
+              lineHeight: 1.6,
+              color: '#F9FAFB',
+              caretColor: '#34D399', // Green cursor
             }}
           />
 
           {/* Copy Button */}
           <button
             onClick={copyToClipboard}
-            className="absolute top-3 right-3 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/70 text-white p-2 rounded-lg transition-all"
+            className="absolute top-4 right-4 bg-gray-700/60 hover:bg-gray-600/80 text-white p-2 rounded-lg transition-all transform hover:scale-105"
             title="Copy Code"
           >
             {copied ? (
@@ -186,7 +173,8 @@ function App() {
         <button
           onClick={reviewCode}
           disabled={isLoading || !code.trim()}
-          className="mt-4 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition duration-200"
+          // Changed to a more vibrant primary button style
+          className="mt-6 flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-400 text-white font-extrabold px-6 py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-300 transform hover:-translate-y-0.5"
         >
           {isLoading ? (
             <>
@@ -200,9 +188,9 @@ function App() {
       </div>
 
       {/* Right Section (Review Output) */}
-      <div className="flex-1 min-h-[40vh] lg:min-h-full bg-gray-800 p-6 rounded-xl shadow-2xl flex flex-col">
-        <h2 className="text-2xl font-bold mb-3 text-green-400">AI Code Review</h2>
-        <div className="flex-1 overflow-auto bg-gray-900 p-4 rounded-lg">
+      <div className="flex-1 min-h-[40vh] lg:min-h-full bg-gray-900 p-5 rounded-3xl shadow-2xl shadow-gray-900/50 flex flex-col border border-gray-800">
+        <h2 className="text-3xl font-extrabold mb-4 text-emerald-400 border-b border-gray-700/50 pb-2">AI Code Review</h2>
+        <div className="flex-1 overflow-auto bg-gray-800 p-6 rounded-xl border border-gray-700/50">
             <ReviewDisplay />
         </div>
       </div>
