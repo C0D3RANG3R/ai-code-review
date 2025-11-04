@@ -8,11 +8,12 @@ import "highlight.js/styles/github-dark.css";
 import axios from "axios";
 import { ClipboardCopy, Check, Loader2, AlertTriangle } from "lucide-react";
 
-const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/ai/get-review`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = `${API_BASE_URL}/ai/get-review`;
 const INITIAL_CODE = `function calculateTotal(items) {
   let total = 0;
-  for (let i = 0; i < items.length; i++) {
-    total += items[i].price * items[i].quantity;
+  for (const item of items) {
+    total += item.price * item.quantity;
   }
   return total;
 }
@@ -28,12 +29,19 @@ function App() {
 
   useEffect(() => {
     editorRef.current?.querySelector("textarea")?.focus();
-  }, [code]);
+  }, []);
 
   async function reviewCode() {
     setReview("");
     setError(null);
     setIsLoading(true);
+    
+    if (!code.trim()) {
+        setError("Please enter code before requesting a review.");
+        setIsLoading(false);
+        return;
+    }
+
     try {
       const response = await axios.post(API_URL, { code });
       setReview(response.data.review);
@@ -42,7 +50,7 @@ function App() {
       if (error.response) {
         message = error.response.data.error || `Server error: ${error.response.status}`;
       } else if (error.request) {
-        message = "Network Error: Could not reach the API server. Check backend is running on port 8000.";
+        message = `Network Error: Could not reach the API server at ${API_BASE_URL}.`;
       } else {
         message = error.message;
       }
@@ -56,12 +64,7 @@ function App() {
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(code);
     } else {
-      const textarea = document.createElement("textarea");
-      textarea.value = code;
-      document.body.appendChild(textarea);
-      textarea.select();
       document.execCommand("copy");
-      document.body.removeChild(textarea);
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -69,15 +72,20 @@ function App() {
 
   const ReviewDisplay = () => {
     useEffect(() => {
-      const codeBlocks = document.querySelectorAll("pre code.hljs");
+      if (!review) return;
+
+      const codeBlocks = document.querySelectorAll("pre code");
       codeBlocks.forEach((block) => {
         if (block.parentElement.querySelector(".copy-btn")) return;
+
+        const pre = block.parentElement;
         const button = document.createElement("button");
         button.textContent = "Copy";
         button.className =
           "copy-btn absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-sm text-white px-2 py-1 rounded transition";
-        block.parentElement.style.position = "relative";
-        block.parentElement.appendChild(button);
+        pre.style.position = "relative";
+        pre.appendChild(button);
+
         button.onclick = () => {
           navigator.clipboard.writeText(block.innerText);
           button.textContent = "Copied!";
@@ -90,15 +98,16 @@ function App() {
       });
     }, [review]);
 
-    if (isLoading)
+    if (isLoading) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-gray-400">
           <Loader2 className="animate-spin h-10 w-10 text-yellow-400" />
           <p className="mt-4 text-lg font-semibold">Generating Review...</p>
         </div>
       );
+    }
 
-    if (error)
+    if (error) {
       return (
         <div className="flex flex-col items-center justify-center h-full p-6 bg-red-900/30 border border-red-600 rounded-xl">
           <AlertTriangle className="h-12 w-12 text-red-500" />
@@ -106,21 +115,22 @@ function App() {
           <p className="mt-2 text-center text-red-300 break-words text-sm">{error}</p>
         </div>
       );
+    }
 
-    if (review)
+    if (review) {
       return (
         <Markdown
           rehypePlugins={[rehypeHighlight]}
           className="prose prose-invert max-w-none text-gray-200 overflow-auto h-full p-1 leading-loose
-                     prose-pre:prose-pre:border prose-pre:border-gray-700 prose-pre:text-white
-                     prose-pre:rounded-xl prose-pre:px-4 prose-pre:py-3
-                     prose-pre:mr-2 prose-pre:ml-1
+                     prose-pre:border prose-pre:border-gray-700 prose-pre:text-white
+                     prose-pre:rounded-xl prose-pre:px-4 prose-pre:py-3 prose-pre:overflow-x-auto
                      prose-code:bg-gray-700/50 prose-code:text-yellow-300 prose-code:rounded-md prose-code:px-1
                      prose-li:marker:text-orange-400 prose-strong:text-yellow-300"
         >
           {review}
         </Markdown>
       );
+    }
 
     return (
       <div className="flex items-center justify-center h-full text-gray-500">

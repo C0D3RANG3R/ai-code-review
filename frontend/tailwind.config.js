@@ -1,3 +1,5 @@
+import typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -7,8 +9,7 @@ export default {
   theme: {
     extend: {},
   },
-  // 🚨 THIS PLUGIN IS REQUIRED FOR PROSE STYLING TO WORK
   plugins: [
-    require('@tailwindcss/typography'), 
+    typography, 
   ],
 }
