@@ -6,7 +6,7 @@ const { errorHandler } = require('./src/middleware/error.middleware');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const CLIENT_URL = process.env.CLIENT_URL || 'https://your-frontend-name.vercel.app';
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 app.use(express.json());
 app.use(cors({
