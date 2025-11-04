@@ -22,7 +22,7 @@ The project consists of two main subfolders, managed from the root directory:
 
 | Service | URL |
 |----------|-----|
-| **Frontend (Vercel)** | [https://ai-code-review-mk6gko2ht-c0d3rang3rs-projects.vercel.app](https://ai-code-review-mk6gko2ht-c0d3rang3rs-projects.vercel.app) |
+| **Frontend (Vercel)** | [https://ai-code-review-dun.vercel.app/](https://ai-code-review-dun.vercel.app/) |
 | **Backend (Render)** | [https://ai-code-review-backend.onrender.com](https://ai-code-review-backend.onrender.com) |
 
 > The frontend communicates with the backend’s `/ai/get-review` endpoint for AI-powered review generation.
