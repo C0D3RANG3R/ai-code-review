@@ -8,7 +8,9 @@ import "highlight.js/styles/github-dark.css";
 import axios from "axios";
 import { ClipboardCopy, Check, Loader2, AlertTriangle } from "lucide-react";
 
-const API_URL = "/ai/get-review";
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/ai/get-review`
+  : "http://localhost:8000/ai/get-review";
 const INITIAL_CODE = `function calculateTotal(items) {
   let total = 0;
   for (let i = 0; i < items.length; i++) {
