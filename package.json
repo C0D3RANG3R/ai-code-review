@@ -1,21 +1,29 @@
 {
-  "name": "full-stack-ai-reviewer",
+  "name": "ai-code-reviewer-app",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Monorepo for the AI Code Reviewer application (Backend + Frontend).",
+  "main": "index.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "install-frontend": "cd frontend && npm install",
-    "install-backend": "cd backend && npm install",
-    "build-frontend": "cd frontend && npm run build",
-    "build": "npm run install-backend && npm run install-frontend && npm run build-frontend",
-    "dev": "concurrently \"cd backend && npm run start:dev\" \"cd frontend && npm run dev\""
+    "install:all": "npm install && npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm start",
+    "start:dev": "concurrently --kill-others \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev"
   },
-  "dependencies": {
-    "express": "^4.21.2"
-  },
+  "keywords": [
+    "react",
+    "express",
+    "gemini"
+  ],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "concurrently": "^8.2.0",
-    "nodemon": "^3.1.4"
+    "concurrently": "^8.2.2"
   },
   "engines": {
     "node": ">=18.0.0"
