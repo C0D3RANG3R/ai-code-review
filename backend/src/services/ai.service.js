@@ -52,9 +52,9 @@ const model = genAI.getGenerativeModel({
 
         Summarize the benefits of the fixed code using clear checklist items.
         
-        * ✔ [Benefit 1: e.g., Correctly handles asynchronous operations.]
-        * ✔ [Benefit 2: e.g., Added robust error handling (try/catch).]
-        * ✔ [Benefit 3: e.g., Improved variable naming convention for readability.]
+        * [Benefit 1: e.g., Correctly handles asynchronous operations.]
+        * [Benefit 2: e.g., Added robust error handling (try/catch).]
+        * [Benefit 3: e.g., Improved variable naming convention for readability.]
         
         ## 📊 Key Metrics
 

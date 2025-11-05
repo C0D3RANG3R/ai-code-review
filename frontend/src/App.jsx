@@ -4,7 +4,7 @@ import Editor from "react-simple-code-editor";
 import prism from "prismjs";
 import "highlight.js/styles/github-dark.css";
 import axios from "axios";
-import { ClipboardCopy, Check, Loader2 } from "lucide-react";
+import { ClipboardCopy, Check } from "lucide-react";
 import ReviewDisplay from "./components/ReviewDisplay";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -105,7 +105,6 @@ function App() {
         >
           {isLoading ? (
             <>
-              <Loader2 className="animate-spin h-5 w-5" />
               Reviewing...
             </>
           ) : (
