@@ -2,7 +2,7 @@
 
 This project is a **full-stack AI-powered code reviewer** built using the **Google Gemini API**.  
 It instantly provides **expert-level code reviews** with actionable feedback and metrics.  
-
+Backend URL: 
 The application is structured as a **monorepo**, separating backend and frontend logic for better scalability and maintainability.
 
 ---
@@ -15,6 +15,17 @@ The project consists of two main subfolders, managed from the root directory:
 |--------|-------------|----------|
 | **backend/** | Node.js, Express, Gemini API | Hosts the REST API, manages environment secrets, handles API requests to Google Gemini, and implements robust error handling. |
 | **frontend/** | React, Vite, Tailwind CSS | Provides the user interface with a code editor, API integration, and structured AI review display. |
+
+---
+
+## 🌐 Production URLs
+
+| Service | URL |
+|----------|-----|
+| **Frontend (Vercel)** | [https://ai-code-review-dun.vercel.app/](https://ai-code-review-dun.vercel.app/) |
+| **Backend (Render)** | [https://ai-code-review-backend.onrender.com](https://ai-code-review-backend.onrender.com) |
+
+> The frontend communicates with the backend’s `/ai/get-review` endpoint for AI-powered review generation.
 
 ---
 
